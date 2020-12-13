@@ -3,11 +3,14 @@ package com.devrajnish.mynews.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,15 +24,26 @@ import com.devrajnish.mynews.viewmodel.ArticleViewModel;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements RecyclerAdapter.ItemClickListener{
+//Created by Rajnish Sharma on 13 Dec 2020
+
+public class MainActivity extends AppCompatActivity implements RecyclerAdapter.ItemClickListener {
     private List<Article> list;
     private ArticleViewModel articleViewModel;
     RecyclerAdapter recyclerAdapter;
+    private ProgressBar progressBar;
+    private Spinner sortSpinner;
+
+    String[] strSort = {"Newest", "popularity", "Oldest"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        progressBar = findViewById(R.id.progress_circular);
+        sortSpinner = findViewById(R.id.sort_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, strSort);
+        sortSpinner.setAdapter(adapter);
+        loadingProgressBarVisible();
         initToolbar();
         initRecycler();
     }
@@ -42,14 +56,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.I
 
     private void initRecycler() {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        final TextView noResult = findViewById(R.id.error);
+        final ImageView noResult = findViewById(R.id.no_result);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerAdapter = new RecyclerAdapter(list, this, this);
         recyclerView.setAdapter(recyclerAdapter);
 
         articleViewModel = ViewModelProviders.of(this).get(ArticleViewModel.class);
-        articleViewModel.getAllArticle().observe(this, new Observer<List<Article>>() {
+        articleViewModel.getMutableLiveData().observe(this, new Observer<List<Article>>() {
             @Override
             public void onChanged(List<Article> articles) {
                 if (articles != null) {
@@ -59,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.I
                 } else {
                     noResult.setVisibility(View.VISIBLE);
                 }
+                loadingProgressBarGone();
             }
         });
     }
@@ -76,5 +91,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.I
         Intent intent = new Intent(MainActivity.this, ArticleActivity.class);
         intent.putExtra("map", map);
         startActivity(intent);
+    }
+
+    public void loadingProgressBarVisible() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void loadingProgressBarGone() {
+        progressBar.setVisibility(View.GONE);
     }
 }
