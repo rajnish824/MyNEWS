@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MyNEWS</string>
     <string name="location">location</string>
+    <string name="see_full_story"><u>See full story</u></string>
+    <string name="filter">Filter</string>
+    <string name="search_query">Search for news, topics…</string>
 </resources>
