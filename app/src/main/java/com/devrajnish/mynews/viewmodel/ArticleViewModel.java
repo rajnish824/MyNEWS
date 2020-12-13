@@ -25,6 +25,17 @@ public class ArticleViewModel extends ViewModel {
     String category = "business";
     String sortBy = "oldest";
 
+    public void setCountry(String _country){
+        country = _country;
+    }
+
+    public void setCategory(String _category){
+        category = _category;
+    }
+
+    public void setSortBy(String _sortBy){
+        sortBy = _sortBy;
+    }
 
     String news_url = "top-headlines?country=" + country + "&category=" + category + "&sortBy=" + sortBy + "&apiKey=" + apiKey;
 

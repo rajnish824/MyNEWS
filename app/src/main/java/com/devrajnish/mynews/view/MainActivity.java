@@ -3,10 +3,12 @@ package com.devrajnish.mynews.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -41,8 +43,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.I
         setContentView(R.layout.activity_main);
         progressBar = findViewById(R.id.progress_circular);
         sortSpinner = findViewById(R.id.sort_spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, strSort);
-        sortSpinner.setAdapter(adapter);
         loadingProgressBarVisible();
         initToolbar();
         initRecycler();
@@ -63,11 +63,30 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.I
         recyclerView.setAdapter(recyclerAdapter);
 
         articleViewModel = ViewModelProviders.of(this).get(ArticleViewModel.class);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, strSort);
+        sortSpinner.setAdapter(adapter);
+
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String sortBy = sortSpinner.getSelectedItem().toString().trim();
+                Toast.makeText(MainActivity.this, sortBy, Toast.LENGTH_SHORT).show();
+                articleViewModel.setSortBy(sortBy);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         articleViewModel.getMutableLiveData().observe(this, new Observer<List<Article>>() {
             @Override
             public void onChanged(List<Article> articles) {
                 if (articles != null) {
                     list = articles;
+                    recyclerAdapter.notifyDataSetChanged();
                     recyclerAdapter.setArticleList(articles);
                     noResult.setVisibility(View.GONE);
                 } else {
