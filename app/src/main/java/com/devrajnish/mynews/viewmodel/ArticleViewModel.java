@@ -8,6 +8,7 @@ import com.devrajnish.mynews.api.APIInterface;
 import com.devrajnish.mynews.api.ApiClient;
 import com.devrajnish.mynews.model.Article;
 import com.devrajnish.mynews.model.ResponseModel;
+import com.devrajnish.mynews.view.MainActivity;
 
 import java.util.List;
 
@@ -16,35 +17,77 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ArticleViewModel extends ViewModel {
+    MutableLiveData<List<Article>> latestArticles;
     MutableLiveData<List<Article>> allArticle;
+    MutableLiveData<List<Article>> sourceArticle;
 
     public final static String BASE_URL = "https://newsapi.org/v2/";
+    String apiKey = "81080f0b9ee94f36be68d431b249293d";
 
-    String apiKey = "b60165836b05432cb0721316b0a2c681";
+    //default values
     String country = "in";
-    String category = "business";
-    String sortBy = "oldest";
+    String sources = "";
+    String sortBy = "";
+    String query = "breaking-news";
+    int page = 1;
 
-    public void setCountry(String _country){
-        country = _country;
+    public void setPage(int _page) {
+        page = _page;
     }
 
-    public void setCategory(String _category){
-        category = _category;
+    public void setCountry(String _country) {
+        this.country = _country;
     }
 
-    public void setSortBy(String _sortBy){
+    public void setQuery(String _query) {
+        query = _query;
+    }
+
+    public void setSortBy(String _sortBy) {
         sortBy = _sortBy;
     }
 
-    String news_url = "top-headlines?country=" + country + "&category=" + category + "&sortBy=" + sortBy + "&apiKey=" + apiKey;
+    public void setSources(String _sources){
+        sources = _sources;
+    }
+
+    String top_headline = "top-headlines?country=" + country + "&apiKey=" + apiKey;
+
+    String all_article = "everything?q=" + query + "&sortBy=" + sortBy + "&apiKey=" + apiKey;
+
+    String source_article = "everything?domains=" + sources + "&apiKey=" + apiKey;
 
     public MutableLiveData<List<Article>> getMutableLiveData() {
+        if (latestArticles == null) {
+            latestArticles = new MutableLiveData<>();
+        }
+        APIInterface apiInterface = ApiClient.getClient(BASE_URL).create(APIInterface.class);
+        apiInterface.getLatestNews(top_headline).enqueue(new Callback<ResponseModel>() {
+            @Override
+            public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+                if (response.isSuccessful()) {
+                    ResponseModel responseModel = response.body();
+                    List<Article> articles = responseModel.getArticles();
+                    latestArticles.setValue(articles);
+                } else {
+                    //Problem in fetching data due to some reason
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseModel> call, Throwable t) {
+                //problem from API
+            }
+        });
+        return latestArticles;
+    }
+
+    public MutableLiveData<List<Article>> getAllArticle() {
         if (allArticle == null) {
             allArticle = new MutableLiveData<>();
         }
         APIInterface apiInterface = ApiClient.getClient(BASE_URL).create(APIInterface.class);
-        apiInterface.getLatestNews(news_url).enqueue(new Callback<ResponseModel>() {
+        apiInterface.getEverything(all_article).enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
                 if (response.isSuccessful()) {
@@ -60,5 +103,28 @@ public class ArticleViewModel extends ViewModel {
             }
         });
         return allArticle;
+    }
+
+    public MutableLiveData<List<Article>> getSourceArticle(){
+        if (sourceArticle == null){
+            sourceArticle = new MutableLiveData<>();
+        }
+        APIInterface apiInterface = ApiClient.getClient(BASE_URL).create(APIInterface.class);
+        apiInterface.getFromSource(source_article).enqueue(new Callback<ResponseModel>() {
+            @Override
+            public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+                if (response.isSuccessful()){
+                    ResponseModel responseModel = response.body();
+                    List<Article> articles = responseModel.getArticles();
+                    sourceArticle.setValue(articles);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseModel> call, Throwable t) {
+
+            }
+        });
+        return sourceArticle;
     }
 }

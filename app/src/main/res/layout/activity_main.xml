@@ -38,7 +38,6 @@
                 android:id="@+id/location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="India"
                 android:layout_gravity="end"
                 android:drawablePadding="3dp"
                 android:textColor="@color/white"
@@ -67,6 +66,10 @@
                 android:textCursorDrawable="@drawable/color_cursor"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLength="40"
+                android:maxLines="1"
                 android:background="@drawable/round_corner"
                 android:backgroundTint="#9ACED3DC"
                 android:paddingEnd="10dp"
@@ -108,6 +111,8 @@
         android:id="@+id/sort_spinner"
         android:layout_width="wrap_content"
         android:layout_height="22dp"
+        android:gravity="center"
+        android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
@@ -115,17 +120,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relLayout1" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topic" />
+        app:layout_constraintTop_toBottomOf="@+id/topic">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/floating_action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"

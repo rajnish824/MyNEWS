@@ -60,7 +60,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         Article article = list.get(position);
         holder.articleSource.setText(article.getSource().getName());
         holder.articleTitle.setText(article.getTitle());
-        holder.articleTime.setText(list.get(position).getPublishedAt());
+        holder.articleTime.setText(getNiceDate(position));
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.centerCrop();
@@ -113,8 +113,26 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
-    public interface ItemClickListener{
+    public String getNiceDate(int position){
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+        String dateStr = list.get(position).getPublishedAt();
+        Date date = null;
+        try {
+            date = inputFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        assert date != null;
+        return  (String) DateUtils.getRelativeTimeSpanString(date.getTime(), Calendar.getInstance().getTimeInMillis(), DateUtils.MINUTE_IN_MILLIS);
+    }
+
+    public interface ItemClickListener {
         public void onArticleClick(Article article);
+    }
+
+    public void filterList(List<Article> filteredList) {
+        list = filteredList;
+        notifyDataSetChanged();
     }
 }
 
